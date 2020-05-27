@@ -1,22 +1,53 @@
-# Deploy a People Counter App at the Edge
+# People Counter App at the Edge
+This application is a smart IoT solution for counting people. It uses the Intel® OpenVINO™ software to run inference on a video. input and provide information on the people in a designated area by providing the number of people in the frame, average duration of people in frame and total count of people.
 
-| Details            |              |
-|-----------------------|---------------|
-| Programming Language: |  Python 3.5 or 3.6 |
+## Model Selection
+I carried out a little bit of research and after reading this [article](https://medium.com/@madhawavidanapathirana/real-time-human-detection-in-computer-vision-part-2-c7eda27115c6), I decided to go with faster rcnn v2 inception model. I had to use the OpenVINO™ Model Optimizer to convert the model to OpenVINO™ Intermediate Representation in order for it to be compatible with OpenVINO™. The steps are listed below : 
 
-![people-counter-python](./images/people-counter-image.png)
+**1)** Download the rcnn model from the [tensorflow model zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md#coco-trained-models-coco-models):
 
-## What it Does
+__`❍ wget http://download.tensorflow.org/models/object_detection/faster_rcnn_inception_v2_coco_2018_01_28.tar.gz`__
 
-The people counter application will demonstrate how to create a smart video IoT solution using Intel® hardware and software tools. The app will detect people in a designated area, providing the number of people in the frame, average duration of people in frame, and total count.
+**2)** Uncompress the file:
 
-## How it Works
+__`❍ tar -xvf faster_rcnn_inception_v2_coco_2018_01_28.tar.gz`__
 
-The counter will use the Inference Engine included in the Intel® Distribution of OpenVINO™ Toolkit. The model used should be able to identify people in a video frame. The app should count the number of people in the current frame, the duration that a person is in the frame (time elapsed between entering and exiting a frame) and the total count of people. It then sends the data to a local web server using the Paho MQTT Python package.
+**3)** Enter this directory:
 
-You will choose a model to use and convert it with the Model Optimizer.
+__`❍ cd faster_rcnn_inception_v2_coco_2018_01_28`__
 
-![architectural diagram](./images/arch_diagram.png)
+**4)** Run the OpenVINO™ Model Optimizer to get the Intermediate Representation of the model for OpenVINO™:
+
+```
+❍ python /opt/intel/openvino/deployment_tools/model_optimizer/mo.py --input_model faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb --tensorflow_object_detection_api_pipeline_config pipeline.config --reverse_input_channels --tensorflow_use_custom_operations_config /opt/intel/openvino/deployment_tools/model_optimizer/extensions/front/tf/faster_rcnn_support.json
+```
+
+## Model Performance
+I tested the rcnn model and this was my values after testing. The comparison was carried out by comparing latency and memory of the model before and after conversion to Intermediate representation.
+
+| Model/Framework                             | Latency (microseconds)            | Memory (Mb) |
+| -----------------------------------         |:---------------------------------:| -------:|
+| faster_rcnn_inception_v2_coco (plain TF)    | 1270                              | 562    |
+| faster_rcnn_inception_v2_coco (OpenVINO)    | 889                               | 281    |
+
+## Project Use Cases
+Some of the use cases of this project is listed below:
+
+**1)** It can be used to keep record of the number of people that visited an area.
+
+**2)** It can help in limiting the number of people in a location
+
+## Effects on End user needs
+Lighting, model accuracy, and camera focal length/image size have different effects on a deployed edge model. The potential effects of each of these are as follows:
+
+* If lighting is too dim or if model is to be used in the dark, more work would have to go into selecting the right model or including some custom layers to improve inference in low light conditions. 
+
+* If model accuracy is poor, then it would probably not identify everyonee passing through the frame and would end up being redundant and can lead to overcrowding.
+
+* If focal length is increased, model might be too narrow and not capture the full frame, miss some people in the frame and if decreased can reduce inference power of model.
+
+## Additional feature
+I added an additional feature whereby an alarm starts blaring once the total count of people in the video passes a certain threshold. I also attempted adding a toggle for the camera but i couldn't get that working.
 
 ## Requirements
 
