@@ -6,6 +6,7 @@ import GraphPane from "components/graph-pane/GraphPane";
 import FontAwesome from "react-fontawesome";
 import mq from "../../MqttClient";
 import { MQTT, SETTINGS } from "../../constants/constants";
+import Sound from 'react-sound';
 import "./Stats.css";
 
 class Stats extends React.Component {
@@ -172,6 +173,12 @@ class Stats extends React.Component {
     };
 
     return (
+      <div>
+        { this.state.durations.length > 3 ?
+        <Sound  
+          url="../../assets/sound.wav"
+          playStatus={Sound.status.PLAYING}
+        /> : null}
       <div className={ `stats ${ this.props.statsOn ? "active" : "" }` }>
         { /* Current count */ }
         <DataBox title="People in frame" data={ this.state.currentCount } />
@@ -186,6 +193,7 @@ class Stats extends React.Component {
           <button className="counter-close" onClick={ this.props.toggleTotalCount }><FontAwesome name="toggle-right" size="2x" /></button>
           <DataBox title="Total Counted" data={ this.state.durations.length } color="blue" />
         </div>
+      </div>
       </div>
     );
   }
