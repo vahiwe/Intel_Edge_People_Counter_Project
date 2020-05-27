@@ -1,9 +1,11 @@
 // actions
 const TOGGLE_STATS = "features/stats/TOGGLE_STATS";
 const TOGGLE_COUNT = "features/stats/TOGGLE_COUNT";
+const TOGGLE_CAMERA = "features/camera-feed/TOGGLE_CAMERA";
 
 // initial state
 const initialState = {
+  cameraOn: true,
   statsOn: false,
   totalCountOn: false,
   peopleSeen: [],
@@ -25,6 +27,11 @@ export default function reducer( state = initialState, action = {} ) {
         ...state,
         totalCountOn: !state.totalCountOn,
       };
+    case TOGGLE_CAMERA:
+      return {
+        ...state,
+        cameraOn: !state.cameraOn,
+      };
     default: return state;
   }
 }
@@ -36,4 +43,8 @@ export function toggleStats() {
 
 export function toggleTotalCount() {
   return { type: TOGGLE_COUNT };
+}
+
+export function toggleCamera() {
+  return { type: TOGGLE_CAMERA };
 }
