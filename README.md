@@ -46,6 +46,9 @@ Lighting, model accuracy, and camera focal length/image size have different effe
 
 * If focal length is increased, model might be too narrow and not capture the full frame, miss some people in the frame and if decreased can reduce inference power of model.
 
+## Custom Layers 
+Custom layers are layers that are not included in the list of known layers. If your topology contains any layers that are not in the list of known layers, the Model Optimizer classifies them as custom. Intel® OpenVINO™ already contains extensions for custom layers used in TensorFlow Object Detection Model Zoo thus no additional processing was done to the custom layers.
+
 ## Additional feature
 I added an additional feature whereby an alarm starts blaring once the total count of people in the video passes a certain threshold. I also attempted adding a toggle for the camera but i couldn't get that working.
 
